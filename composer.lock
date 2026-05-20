@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "533a4bf6092764c481a1c19b9cd8f1ee",
+    "content-hash": "a9953bc3fc56dcdd312327ec2e081bff",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2041,6 +2041,45 @@
                 "source": "https://github.com/OndraM/ci-detector/tree/4.2.0"
             },
             "time": "2024-03-12T13:22:30+00:00"
+        },
+        {
+            "name": "openswoole/ide-helper",
+            "version": "26.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/openswoole/ide-helper.git",
+                "reference": "f5cb2ba6d3108b1e158fbff1e1b44e5782f0f4ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/openswoole/ide-helper/zipball/f5cb2ba6d3108b1e158fbff1e1b44e5782f0f4ff",
+                "reference": "f5cb2ba6d3108b1e158fbff1e1b44e5782f0f4ff",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openswoole": ">=26.2.0",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.6"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "OpenSwoole Group",
+                    "email": "hello@openswoole.com"
+                }
+            ],
+            "description": "IDE helper for OpenSwoole.",
+            "support": {
+                "issues": "https://github.com/openswoole/ide-helper/issues",
+                "source": "https://github.com/openswoole/ide-helper/tree/26.2.0"
+            },
+            "time": "2026-02-28T15:02:47+00:00"
         },
         {
             "name": "phpro/grumphp",

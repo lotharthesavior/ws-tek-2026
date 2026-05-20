@@ -5,7 +5,8 @@
     "require": {
         "php": ">=8.2",
         "ext-openswoole": ">=22.0",
-        "kanata-php/socket-conveyor": "^2.4"
+        "kanata-php/socket-conveyor": "^2.4",
+        "openswoole/ide-helper": "^26.2"
     },
     "autoload": {
         "psr-4": {

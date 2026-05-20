@@ -1,14 +1,15 @@
 services:
   presentation:
     build: .
+    image: websockets-visible:latest
+    container_name: websockets-visible-presentation
+    entrypoint: ["/usr/local/bin/app-entrypoint"]
+    command: php server.php
+    user: "${UID:-1000}:${GID:-1000}"
     ports:
-      - "8989:8989"
+      - "0.0.0.0:8989:8989"
     volumes:
-      # Bind-mount source so HTML/PHP changes are live without rebuild
-      - .:/app
-      # Anonymous volume shadows the bind-mounted vendor/ with the one built
-      # inside the image (PHP 8.1-compatible autoloader). Without this, the
-      # host vendor — which may have been built on a different PHP version —
-      # would cause a platform_check.php failure at startup.
-      - /app/vendor
+      - ./:/app
+    environment:
+      COMPOSER_BOOTSTRAP: "1"
     restart: unless-stopped

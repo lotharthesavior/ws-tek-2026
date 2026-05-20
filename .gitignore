@@ -1,0 +1,24 @@
+# Dependencies
+/vendor/
+
+# Environment files
+/.env
+/.env.*
+!/.env.example
+
+# Runtime and cache artifacts
+/*.log
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+/.phpactor.json
+
+# Local tool state
+/.docker-state/
+/.agents/
+/.codex/
+
+# Editor and OS files
+/.idea/
+/.vscode/
+/.DS_Store
+Thumbs.db
