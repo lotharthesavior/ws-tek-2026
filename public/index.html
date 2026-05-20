@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebSockets with OpenSwoole — PHPTek 2026</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css"
+      id="theme"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css"
+    />
+
+    <style>
+      :root {
+        --accent: #00d4ff;
+        --accent-2: #ff6b9d;
+      }
+      .reveal h1,
+      .reveal h2,
+      .reveal h3 {
+        text-transform: none;
+        letter-spacing: -0.02em;
+      }
+      .reveal h1 {
+        color: var(--accent);
+      }
+      .reveal h2 {
+        color: var(--accent);
+      }
+      .reveal .accent {
+        color: var(--accent);
+      }
+      .reveal .accent-2 {
+        color: var(--accent-2);
+      }
+      .reveal .muted {
+        color: #888;
+        font-size: 0.7em;
+      }
+      .reveal .big-number {
+        font-size: 4em;
+        font-weight: 800;
+        color: var(--accent-2);
+        line-height: 1;
+      }
+      .reveal .flex {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+      }
+      .reveal .card {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        display: inline-block;
+        margin: 0.5rem;
+      }
+      .reveal pre {
+        box-shadow: none;
+        font-size: 0.55em;
+      }
+      .reveal pre code {
+        padding: 1rem;
+        border-radius: 8px;
+      }
+      .reveal ul {
+        list-style: none;
+        padding: 0;
+      }
+      .reveal ul li {
+        margin: 0.5em 0;
+        padding-left: 1.2em;
+        position: relative;
+      }
+      .reveal ul li::before {
+        content: "▸";
+        color: var(--accent);
+        position: absolute;
+        left: 0;
+      }
+      .reveal .arrow {
+        font-size: 2em;
+        color: var(--accent);
+      }
+      .reveal .node {
+        background: #1e2a3a;
+        border: 2px solid var(--accent);
+        padding: 0.8em 1.5em;
+        border-radius: 8px;
+        display: inline-block;
+        margin: 0 0.5em;
+        font-weight: 600;
+      }
+      .reveal .node.alt {
+        background: #2a1e3a;
+        border-color: var(--accent-2);
+      }
+      .reveal footer {
+        position: fixed;
+        bottom: 12px;
+        left: 20px;
+        font-size: 14px;
+        color: #555;
+      }
+      .reveal .slide-number {
+        color: #666;
+      }
+      .reveal blockquote {
+        border-left: 4px solid var(--accent);
+        background: #151515;
+        padding: 1em 1.5em;
+        font-style: normal;
+      }
+      .reveal .demo-link {
+        display: block;
+        background: #1a1a1a;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        padding: 0.8rem 1.5rem;
+        margin: 0.5rem auto;
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 0.9em;
+        max-width: 400px;
+        transition: background 0.2s;
+      }
+      .reveal .demo-link:hover {
+        background: #0d2a33;
+      }
+      .reveal .demo-link .demo-tag {
+        font-size: 0.65em;
+        color: #888;
+        display: block;
+        margin-top: 0.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- Slide 1: Title -->
+        <section>
+          <h1>WebSockets</h1>
+          <h2 style="margin-top: -0.3em">
+            with <span class="accent-2">OpenSwoole</span>
+          </h2>
+          <p style="margin-top: 2em">by <strong>Savio Resende</strong></p>
+          <p class="muted">PHPTek 2026</p>
+        </section>
+
+        <!-- Slide 2: Title -->
+        <!-- <section> -->
+        <!--   <h1></h1> -->
+        <!--   <h2 style="margin-top: -0.3em"> -->
+        <!--     with <span class="accent-2">OpenSwoole</span> -->
+        <!--   </h2> -->
+        <!--   <p style="margin-top: 2em">by <strong>Savio Resende</strong></p> -->
+        <!--   <p class="muted">PHPTek 2026</p> -->
+        <!-- </section> -->
+
+        <!-- Slide 3: Objectives -->
+        <section>
+          <h2>Talk Objective</h2>
+          <ol style="font-size: 0.9em">
+            <li>
+              <strong class="accent">What</strong> are WebSockets and how they
+              work?
+            </li>
+            <li>
+              <strong class="accent">How</strong> to use WebSockets?
+              <span class="muted">(OpenSwoole context)</span>
+            </li>
+            <li>
+              <strong class="accent">Why</strong> should you use WebSockets?
+              <span class="muted">(with OpenSwoole)</span>
+            </li>
+          </ol>
+        </section>
+
+        <!-- Slide 4: HTTP baseline -->
+        <section>
+          <h2>HTTP</h2>
+          <div class="flex" style="margin-top: 2em">
+            <span class="node">Client</span>
+            <span class="arrow">⇄</span>
+            <span class="node">Server</span>
+          </div>
+          <p class="muted" style="margin-top: 2em">
+            Request → Response. One shot. Client drives.
+          </p>
+        </section>
+
+        <!-- Slide 5: Handshake + Connection flow (merged) -->
+        <section>
+          <h2>WebSocket Handshake</h2>
+          <blockquote style="font-size: 0.75em; margin-bottom: 1em">
+            WebSocket connections are
+            <span class="accent">HTTP connections upgraded</span>.
+          </blockquote>
+          <ol style="font-size: 0.85em">
+            <li>
+              <code>wss://</code> request sent with
+              <code>Upgrade: websocket</code>
+            </li>
+            <li>
+              Server responds
+              <strong class="accent">101 Switching Protocols</strong>
+            </li>
+            <li>
+              Persistent, bidirectional channel open — no more HTTP overhead
+            </li>
+          </ol>
+          <div class="flex" style="margin-top: 1.5em">
+            <span class="node">Client</span>
+            <span class="arrow">⇄</span>
+            <span class="node alt">Server</span>
+          </div>
+        </section>
+
+        <!-- Slide 6: Handshake headers -->
+        <section>
+          <h2>The Upgrade Request</h2>
+          <pre><code class="language-http" data-trim data-noescape>GET / HTTP/1.1
+Host: savioresende.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: {...}
+Sec-WebSocket-Version: 13
+Sec-WebSocket-Protocol: socketconveyor.com</code></pre>
+        </section>
+
+        <!-- Slide 7: Advantages vs Trade-Offs (merged two-column) -->
+        <section>
+          <h2>Advantages vs Trade-Offs</h2>
+          <div
+            class="flex"
+            style="margin-top: 1.5em; align-items: flex-start; gap: 3rem"
+          >
+            <div style="flex: 1">
+              <p style="color: #2ecc71; font-weight: 700; margin-bottom: 0.6em">
+                Advantages
+              </p>
+              <ul style="font-size: 0.82em">
+                <li>
+                  <strong>Bidirectional</strong> — server pushes without prompt
+                </li>
+                <li>
+                  <strong>Efficiency</strong> — faster than HTTP alternatives
+                </li>
+                <li><strong>Low latency</strong> — no handshake per message</li>
+                <li><strong>Low overhead</strong> — small frame headers</li>
+              </ul>
+            </div>
+            <div style="flex: 1">
+              <p
+                style="
+                  color: var(--accent-2);
+                  font-weight: 700;
+                  margin-bottom: 0.6em;
+                "
+              >
+                Trade-Offs
+              </p>
+              <ul style="font-size: 0.82em">
+                <li>
+                  <strong class="accent-2">Complexity</strong> — stateful
+                  connections, reconnection, backpressure
+                </li>
+                <li>
+                  <strong class="accent-2">Security</strong> — new surface area,
+                  new rules
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 10: Scale / Security concerns -->
+        <section>
+          <h2>Scale &amp; Security</h2>
+          <div style="margin-top: 1.5em">
+            <span class="card">Data Framing</span>
+            <span class="card">Message Broker</span>
+            <span class="card">Origin Verification</span>
+            <span class="card">SSL Encryption</span>
+          </div>
+        </section>
+
+        <!-- Slide 11: OpenSwoole -->
+        <section>
+          <h2>What is <span class="accent-2">OpenSwoole</span>?</h2>
+          <ul style="font-size: 0.9em">
+            <li>Asynchronous</li>
+            <li>Parallel</li>
+            <li>High-performance</li>
+            <li>Coroutine-based</li>
+            <li>Communication engine</li>
+          </ul>
+          <p style="margin-top: 1.5em">
+            <span class="accent">TCP</span> / <span class="accent">HTTP</span> /
+            <span class="accent">WebSocket</span>
+            servers — programmatically.
+          </p>
+        </section>
+
+        <!-- Slide 12: Traditional vs OpenSwoole -->
+        <section>
+          <h2>How Is That Different?</h2>
+          <div style="margin-top: 1.5em">
+            <p class="muted">Traditional</p>
+            <div class="flex">
+              <span class="node">Browser</span>
+              <span class="arrow">→</span>
+              <span class="node">WebServer</span>
+              <span class="arrow">→</span>
+              <span class="node">PHP-FPM</span>
+            </div>
+          </div>
+          <div style="margin-top: 1.5em">
+            <p class="muted">With OpenSwoole</p>
+            <div class="flex">
+              <span class="node alt">Browser</span>
+              <span class="arrow">→</span>
+              <span class="node alt">PHP-CLI</span>
+            </div>
+          </div>
+          <p class="muted" style="margin-top: 1.5em; font-size: 0.6em">
+            Reference:
+            <a href="https://openswoole.com/how-it-works"
+              >openswoole.com/how-it-works</a
+            >
+          </p>
+        </section>
+
+        <!-- Slide 12: Benchmarks -->
+        <section>
+          <h2>Alternatives Comparison</h2>
+          <p class="muted" style="font-size: 0.7em">
+            Ping/Pong — 1,000 clients, 2,000 messages each. Tool: Locust.
+          </p>
+          <div
+            class="flex"
+            style="margin-top: 1em; align-items: flex-end; gap: 2rem"
+          >
+            <div class="card" style="min-width: 240px; text-align: center">
+              <strong class="accent" style="font-size: 1.1em">OpenSwoole</strong
+              ><br />
+              <span
+                style="
+                  font-size: 3.5em;
+                  font-weight: 800;
+                  color: #2ecc71;
+                  line-height: 1.1;
+                "
+                >0.42</span
+              ><br />
+              <span class="muted">ms avg</span>
+            </div>
+            <div class="card" style="min-width: 240px; text-align: center">
+              <strong style="font-size: 1.1em">Ratchet</strong><br />
+              <span style="font-size: 1.8em; font-weight: 600; line-height: 1.1"
+                >1.93</span
+              ><br />
+              <span class="muted">ms avg</span>
+            </div>
+          </div>
+          <p class="big-number" style="margin-top: 0.6em">459% faster</p>
+        </section>
+
+        <!-- Slide 13: Code sample - HTTP server -->
+        <section>
+          <h3>OpenSwoole HTTP Server</h3>
+          <pre><code class="language-php" data-trim data-noescape>use OpenSwoole\HTTP\Server;
+
+$server = new Server("0.0.0.0", 9501);
+
+$server->on("request", function ($request, $response) {
+    $response->header("Content-Type", "text/plain");
+    $response->end("Hello from OpenSwoole\n");
+});
+
+$server->start();</code></pre>
+          <aside class="notes">
+            OpenSwoole can serve plain HTTP connections — coroutines, timers,
+            async tasks, and WebSocket all run in the same process.
+          </aside>
+        </section>
+
+        <!-- Slide 14: Code sample - WebSocket server -->
+        <section>
+          <h3>OpenSwoole WebSocket Server</h3>
+          <pre><code class="language-php" data-trim data-noescape>use OpenSwoole\WebSocket\Server;
+
+$server = new Server("0.0.0.0", 9502);
+
+$server->on("open", function ($server, $request) {
+    echo "Connection {$request->fd} opened\n";
+});
+
+$server->on("message", function ($server, $frame) {
+    $server->push($frame->fd, "echo: {$frame->data}");
+});
+
+$server->on("close", function ($server, $fd) {
+    echo "Connection {$fd} closed\n";
+});
+
+$server->start();</code></pre>
+        </section>
+
+        <!-- Slide 17: Code sample - Timer & coroutines -->
+        <section>
+          <h3>Async Scheduling</h3>
+          <pre><code class="language-php" data-trim data-noescape>use OpenSwoole\Timer;
+use OpenSwoole\Coroutine;
+
+// every 5 seconds
+Timer::tick(5000, fn () => doWork());
+
+// once after 5 seconds
+Timer::after(5000, fn () => doWorkOnce());
+
+// coroutine
+Coroutine::create(function () {
+    $result = Coroutine::create(fn () => httpCall());
+    // concurrent, non-blocking
+});</code></pre>
+        </section>
+
+        <!-- Slide 15: Live Demos -->
+        <section>
+          <h2>Live Demos</h2>
+          <p class="muted" style="margin-bottom: 1em">
+            Open in a new tab — server running on port 8989
+          </p>
+          <a class="demo-link" href="/examples/echo.html" target="_blank">
+            WebSocket Echo
+            <span class="demo-tag"
+              >send a message → server echoes back in real-time</span
+            >
+          </a>
+          <a class="demo-link" href="/examples/channel.html" target="_blank">
+            Channel Broadcast
+            <span class="demo-tag"
+              >open two tabs → messages appear on both instantly</span
+            >
+          </a>
+          <a class="demo-link" href="/examples/timer.html" target="_blank">
+            Async Timer Push
+            <span class="demo-tag"
+              >server pushes a timestamp every 2 seconds</span
+            >
+          </a>
+          <p style="margin-top: 1.2em; font-size: 0.72em; color: #555">
+            Each client negotiates subprotocol
+            <code style="color: var(--accent)">socketconveyor.com</code> —
+            visible in DevTools → Network → WS → Headers as
+            <code style="color: #888">ws.protocol</code>
+          </p>
+        </section>
+
+        <!-- Slide 16: Resources -->
+        <section>
+          <h2>Resources</h2>
+          <ul style="font-size: 0.75em">
+            <li>
+              <a href="https://github.com/kanata-php/socket-conveyor"
+                >kanata-php/socket-conveyor</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/kanata-php/conveyor-laravel-broadcaster"
+                >kanata-php/conveyor-laravel-broadcaster</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/Jacked-PHP/jacked-server"
+                >Jacked-PHP/jacked-server</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/Jacked-PHP/live-belt"
+                >Jacked-PHP/live-belt</a
+              >
+            </li>
+          </ul>
+          <p class="muted" style="margin-top: 1.5em; font-size: 0.7em">
+            Joind.in:
+            <a
+              href="https://joind.in/event/phptek-2026/websockets-made-easy-with-openswoole"
+              >websockets-made-easy-with-openswoole</a
+            >
+          </p>
+        </section>
+
+        <!-- Slide 17: Thank You -->
+        <section>
+          <h1>Thank You</h1>
+          <p style="margin-top: 2em">
+            <a href="https://savioresende.com">savioresende.com</a>
+          </p>
+          <p class="muted">@lotharthesavior</p>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        slideNumber: "c/t",
+        transition: "slide",
+        controls: true,
+        progress: true,
+        center: true,
+        plugins: [RevealHighlight, RevealNotes],
+      });
+    </script>
+  </body>
+</html>

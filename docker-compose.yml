@@ -1,0 +1,14 @@
+services:
+  presentation:
+    build: .
+    ports:
+      - "8989:8989"
+    volumes:
+      # Bind-mount source so HTML/PHP changes are live without rebuild
+      - .:/app
+      # Anonymous volume shadows the bind-mounted vendor/ with the one built
+      # inside the image (PHP 8.1-compatible autoloader). Without this, the
+      # host vendor — which may have been built on a different PHP version —
+      # would cause a platform_check.php failure at startup.
+      - /app/vendor
+    restart: unless-stopped

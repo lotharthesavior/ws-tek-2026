@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebSocket Echo — Live Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/channel.css" />
+  </head>
+  <body>
+    <h1>WebSocket Echo</h1>
+    <p class="subtitle">
+      Demonstrates bidirectional WebSocket messaging via
+      <code>base-action</code>
+    </p>
+    <div id="status" class="status connecting">Connecting…</div>
+
+    <div class="chat">
+      <div class="messages" id="messages"></div>
+      <div class="input-row">
+        <input
+          id="input"
+          type="text"
+          placeholder="Type a message and press Enter…"
+          disabled
+        />
+        <button id="send" disabled>Send</button>
+      </div>
+    </div>
+
+    <p class="info">
+      Subprotocol: <code>socketconveyor.com</code> &nbsp;·&nbsp; Message format:
+      <code>{"action":"base-action","data":"your text"}</code>
+    </p>
+
+    <script>
+      const WS_URL = "ws://localhost:8989";
+      const messagesEl = document.getElementById("messages");
+      const inputEl = document.getElementById("input");
+      const sendBtn = document.getElementById("send");
+      const statusEl = document.getElementById("status");
+
+      let ws = null;
+
+      function addMsg(text, type) {
+        const el = document.createElement("div");
+        el.className = "msg " + type;
+        el.textContent = text;
+        messagesEl.appendChild(el);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      function setStatus(label, cls) {
+        statusEl.textContent = label;
+        statusEl.className = "status " + cls;
+      }
+
+      function connect() {
+        setStatus("Connecting…", "connecting");
+        ws = new WebSocket(WS_URL, ["socketconveyor.com"]);
+
+        ws.onopen = () => {
+          setStatus("Connected", "connected");
+          inputEl.disabled = false;
+          sendBtn.disabled = false;
+          addMsg(
+            "Connected to server (protocol: " + (ws.protocol || "none") + ")",
+            "system",
+          );
+        };
+
+        ws.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
+            // Conveyor wraps data: {action, data, fd}
+            const payload = msg.data ?? e.data;
+            // Ignore the connection-info handshake message
+            if (msg.action === "connection-info") {
+              const info =
+                typeof payload === "string" ? JSON.parse(payload) : payload;
+              addMsg("Your fd: " + info.fd, "system");
+              return;
+            }
+            addMsg("← " + payload, "received");
+          } catch {
+            addMsg("← " + e.data, "received");
+          }
+        };
+
+        ws.onclose = () => {
+          setStatus("Disconnected — reconnecting in 3s…", "disconnected");
+          inputEl.disabled = true;
+          sendBtn.disabled = true;
+          addMsg("Disconnected", "system");
+          setTimeout(connect, 3000);
+        };
+
+        ws.onerror = () => {
+          addMsg("Connection error", "system");
+        };
+      }
+
+      function send() {
+        const text = inputEl.value.trim();
+        if (!text || ws?.readyState !== WebSocket.OPEN) return;
+        ws.send(JSON.stringify({ action: "base-action", data: text }));
+        addMsg("→ " + text, "sent");
+        inputEl.value = "";
+      }
+
+      sendBtn.addEventListener("click", send);
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") send();
+      });
+
+      connect();
+    </script>
+  </body>
+</html>

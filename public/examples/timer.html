@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Async Timer Push — Live Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/channel.css" />
+  </head>
+  <body>
+    <h1>Async Timer Push</h1>
+    <p class="subtitle">
+      PHP's <code>OpenSwoole\Timer::tick</code> runs in worker 0 and pushes a
+      timestamp to every client subscribed to <code>timer-channel</code>
+    </p>
+    <div id="status" class="status connecting">Connecting…</div>
+
+    <div class="clock-card">
+      <div class="clock-label">Server time (pushed every 2s)</div>
+      <div class="clock-value" id="clock">--:--:--</div>
+      <div class="tick-count" id="ticks">waiting for first tick…</div>
+    </div>
+
+    <div class="log">
+      <div class="log-header">Raw frames received</div>
+      <div class="log-entries" id="log"></div>
+    </div>
+
+    <div class="hint">
+      Subprotocol: <code>socketconveyor.com</code> &nbsp;·&nbsp; Server-side:
+      <code>Timer::tick(2000, fn)</code> → push
+      <code>{"action":"timer-tick","data":"HH:MM:SS"}</code> to all fds in
+      <code>timer-channel</code>
+    </div>
+
+    <script>
+      const WS_URL = "ws://localhost:8989";
+      const CHANNEL = "timer-channel";
+
+      const clockEl = document.getElementById("clock");
+      const ticksEl = document.getElementById("ticks");
+      const logEl = document.getElementById("log");
+      const statusEl = document.getElementById("status");
+
+      let ws = null;
+      let tickCount = 0;
+
+      function setStatus(label, cls) {
+        statusEl.textContent = label;
+        statusEl.className = "status " + cls;
+      }
+
+      function addLog(raw) {
+        const el = document.createElement("div");
+        el.className = "log-entry";
+        el.innerHTML =
+          '<span class="ts">' +
+          new Date().toLocaleTimeString() +
+          "</span> " +
+          escapeHtml(raw.length > 80 ? raw.slice(0, 80) + "…" : raw);
+        logEl.prepend(el);
+      }
+
+      function escapeHtml(s) {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function joinChannel() {
+        ws.send(
+          JSON.stringify({ action: "channel-connect", channel: CHANNEL }),
+        );
+        setStatus("Listening on timer-channel", "listening");
+      }
+
+      function connect() {
+        setStatus("Connecting…", "connecting");
+        ws = new WebSocket(WS_URL, ["socketconveyor.com"]);
+
+        ws.onopen = () => {
+          setStatus(
+            "Connected (" +
+              (ws.protocol || "no protocol") +
+              ") — joining channel…",
+            "connected",
+          );
+          setTimeout(joinChannel, 150);
+        };
+
+        ws.onmessage = (e) => {
+          addLog(e.data);
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.action === "connection-info") return;
+            if (msg.action === "timer-tick") {
+              tickCount++;
+              clockEl.textContent = msg.data;
+              // Brief colour pulse to show the push arrived
+              clockEl.classList.add("pulse");
+              setTimeout(() => clockEl.classList.remove("pulse"), 300);
+              ticksEl.textContent = "Ticks received: " + tickCount;
+            }
+          } catch {
+            /* ignore non-JSON */
+          }
+        };
+
+        ws.onclose = () => {
+          setStatus("Disconnected — reconnecting in 3s…", "disconnected");
+          setTimeout(connect, 3000);
+        };
+
+        ws.onerror = () => {
+          addLog("ERROR: connection failed");
+        };
+      }
+
+      connect();
+    </script>
+  </body>
+</html>
