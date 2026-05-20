@@ -1,0 +1,19 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "PHPTek 2026 WebSockets demo app",
+  "scripts": {
+    "build:conveyor-client": "esbuild src/conveyor-client-demo.js --bundle --format=iife --platform=browser --outfile=public/js/conveyor-client-demo.js"
+  },
+  "keywords": [
+    "websocket",
+    "socket-conveyor",
+    "openswoole"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.28.0",
+    "socket-conveyor-client": "^1.2.9"
+  }
+}

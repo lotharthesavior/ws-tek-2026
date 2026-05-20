@@ -158,7 +158,7 @@
       <div class="slides">
         <!-- Slide 1: Title -->
         <section>
-          <h1>WebSockets</h1>
+          <h1>WebSockets made easy</h1>
           <h2 style="margin-top: -0.3em">
             with <span class="accent-2">OpenSwoole</span>
           </h2>
@@ -297,7 +297,6 @@ Sec-WebSocket-Protocol: socketconveyor.com</code></pre>
         <section>
           <h2>Scale &amp; Security</h2>
           <div style="margin-top: 1.5em">
-            <span class="card">Data Framing</span>
             <span class="card">Message Broker</span>
             <span class="card">Origin Verification</span>
             <span class="card">SSL Encryption</span>
@@ -437,12 +436,7 @@ Timer::tick(5000, fn () => doWork());
 
 // once after 5 seconds
 Timer::after(5000, fn () => doWorkOnce());
-
-// coroutine
-Coroutine::create(function () {
-    $result = Coroutine::create(fn () => httpCall());
-    // concurrent, non-blocking
-});</code></pre>
+</code></pre>
         </section>
 
         <!-- Slide 15: Live Demos -->
@@ -469,6 +463,12 @@ Coroutine::create(function () {
               >server pushes a timestamp every 2 seconds</span
             >
           </a>
+          <a class="demo-link" href="/conveyor" target="_blank">
+            Conveyor Control Panel
+            <span class="demo-tag"
+              >button-driven client for the Conveyor subprotocol actions</span
+            >
+          </a>
           <p style="margin-top: 1.2em; font-size: 0.72em; color: #555">
             Each client negotiates subprotocol
             <code style="color: var(--accent)">socketconveyor.com</code> —
@@ -488,28 +488,12 @@ Coroutine::create(function () {
             </li>
             <li>
               <a
-                href="https://github.com/kanata-php/conveyor-laravel-broadcaster"
-                >kanata-php/conveyor-laravel-broadcaster</a
-              >
-            </li>
-            <li>
-              <a href="https://github.com/Jacked-PHP/jacked-server"
-                >Jacked-PHP/jacked-server</a
-              >
-            </li>
-            <li>
-              <a href="https://github.com/Jacked-PHP/live-belt"
-                >Jacked-PHP/live-belt</a
+                href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API"
+                >MDN WebSockets Documentation
+                (https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)</a
               >
             </li>
           </ul>
-          <p class="muted" style="margin-top: 1.5em; font-size: 0.7em">
-            Joind.in:
-            <a
-              href="https://joind.in/event/phptek-2026/websockets-made-easy-with-openswoole"
-              >websockets-made-easy-with-openswoole</a
-            >
-          </p>
         </section>
 
         <!-- Slide 17: Thank You -->
@@ -519,6 +503,7 @@ Coroutine::create(function () {
             <a href="https://savioresende.com">savioresende.com</a>
           </p>
           <p class="muted">@lotharthesavior</p>
+          <p><img src="websocket-qr.png" alt="" /></p>
         </section>
       </div>
     </div>

@@ -16,13 +16,16 @@ use OpenSwoole\Timer;
 $host = '0.0.0.0';
 $port = 8989;
 $publicDir = __DIR__ . '/public';
+$staticRouteMap = [
+    '/conveyor' => '/examples/conveyor.html',
+];
 
 // Create channel persistence before server so the timer closure shares the same instance.
 // OpenSwoole Tables are shared memory — must be created before server forks workers.
 $channelPersistence = new SocketChannelPersistenceTable();
 
 // Serve static files from public/ for all unmatched HTTP requests.
-Filter::addFilter(Constants::FILTER_REQUEST_HANDLER, function (callable $default) use ($publicDir): callable {
+Filter::addFilter(Constants::FILTER_REQUEST_HANDLER, function (callable $default) use ($publicDir, $staticRouteMap): callable {
     $mimeMap = [
         'html' => 'text/html; charset=utf-8',
         'css'  => 'text/css',
@@ -33,12 +36,14 @@ Filter::addFilter(Constants::FILTER_REQUEST_HANDLER, function (callable $default
         'ico'  => 'image/x-icon',
     ];
 
-    return function (Request $request, Response $response) use ($publicDir, $mimeMap): void {
+    return function (Request $request, Response $response) use ($publicDir, $mimeMap, $staticRouteMap): void {
         $uri = $request->server['request_uri'] ?? '/';
 
         if ($uri === '/' || $uri === '') {
             $uri = '/index.html';
         }
+
+        $uri = $staticRouteMap[$uri] ?? $uri;
 
         // Prevent directory traversal
         $realPublic = realpath($publicDir);
@@ -63,6 +68,7 @@ echo "  Presentation: http://localhost:{$port}/\n";
 echo "  Echo demo:    http://localhost:{$port}/examples/echo.html\n";
 echo "  Channel demo: http://localhost:{$port}/examples/channel.html\n";
 echo "  Timer demo:   http://localhost:{$port}/examples/timer.html\n";
+echo "  Conveyor UI:  http://localhost:{$port}/conveyor\n";
 
 (new ConveyorServer())
     ->host($host)

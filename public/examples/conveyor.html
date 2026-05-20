@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Conveyor Control Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/conveyor.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">Socket Conveyor</p>
+        <h1>Conveyor Subprotocol Client</h1>
+        <p class="subtitle">
+          Browser WebSocket client with buttons for the core Conveyor actions:
+          connect, broadcast, fanout, disconnect, acknowledge, and user
+          association.
+        </p>
+      </section>
+
+      <section class="panel status-panel">
+        <div>
+          <p class="label">WebSocket</p>
+          <div id="status" class="status connecting">Disconnected</div>
+        </div>
+        <div class="connection-actions">
+          <button id="connectBtn" class="primary">Connect</button>
+          <button id="closeBtn" class="secondary" disabled>Close</button>
+        </div>
+      </section>
+
+      <section class="grid">
+        <section class="panel">
+          <h2>Connection Settings</h2>
+          <label>
+            <span>WS URL</span>
+            <input id="wsUrl" type="text" value="ws://localhost:8989" />
+          </label>
+          <label>
+            <span>Auth Token</span>
+            <input
+              id="auth"
+              type="text"
+              placeholder="Optional unless auth is enabled server-side"
+            />
+          </label>
+          <div class="meta">
+            <span>Negotiated protocol from client package</span>
+            <code id="protocolValue">not connected</code>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Reusable Payload Fields</h2>
+          <label>
+            <span>Channel</span>
+            <input id="channel" type="text" value="demo-channel" />
+          </label>
+          <label>
+            <span>Message Data</span>
+            <textarea id="data" rows="4">
+{"demo":"Hello from the Conveyor subprotocol client."}</textarea
+            >
+          </label>
+          <label>
+            <span>User ID</span>
+            <input id="userId" type="text" value="speaker-1" />
+          </label>
+          <label>
+            <span>Acknowledgement Message ID</span>
+            <input
+              id="ackId"
+              type="text"
+              placeholder="Paste a message id received from the server"
+            />
+          </label>
+        </section>
+      </section>
+
+      <section class="panel">
+        <h2>Action Buttons</h2>
+        <div class="actions">
+          <button data-action="channel-connect" class="accent">
+            channel-connect
+          </button>
+          <button data-action="broadcast-action" class="accent-2">
+            broadcast-action
+          </button>
+          <button data-action="fanout-action" class="accent-3">
+            fanout-action
+          </button>
+          <button data-action="assoc-user-to-fd-action" class="neutral">
+            assoc-user-to-fd-action
+          </button>
+          <button data-action="acknowledge-action" class="neutral">
+            acknowledge-action
+          </button>
+          <button data-action="channel-disconnect" class="danger">
+            channel-disconnect
+          </button>
+        </div>
+        <p class="hint">
+          Payloads are composed from the fields above. `broadcast-action` sends
+          to the current channel, `fanout-action` pushes more broadly, and
+          `acknowledge-action` uses the message id you provide.
+        </p>
+      </section>
+
+      <section class="panel raw-panel">
+        <div class="raw-header">
+          <h2>Raw JSON Override</h2>
+          <button id="sendRawBtn" class="secondary">Send Raw Payload</button>
+        </div>
+        <textarea id="rawPayload" rows="8">
+{
+  "action": "channel-connect",
+  "channel": "demo-channel"
+}</textarea
+        >
+        <p class="hint">
+          Use this when you want to demonstrate a payload outside the preset
+          buttons.
+        </p>
+      </section>
+
+      <section class="panel log-panel">
+        <div class="raw-header">
+          <h2>Event Log</h2>
+          <button id="clearLogBtn" class="secondary">Clear</button>
+        </div>
+        <div id="log" class="log" aria-live="polite"></div>
+      </section>
+    </main>
+    <script src="/js/conveyor-client-demo.js"></script>
+  </body>
+</html>
